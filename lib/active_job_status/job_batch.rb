@@ -33,12 +33,15 @@ module ActiveJobStatus
       end
     end
 
-    def completed?
-      job_statuses = []
-      @job_ids.each do |job_id|
-        job_statuses << ActiveJobStatus.get_status(job_id)
+    def working?
+      @job_ids.detect do |job_id|
+        status = ActiveJobStatus.get_status(job_id)
+        status && (status != ActiveJobStatus::JobStatus::COMPLETED)
       end
-      !job_statuses.any?
+    end
+
+    def completed?
+      !working?
     end
 
     def self.find(batch_id:)
